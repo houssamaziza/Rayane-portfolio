@@ -90,6 +90,8 @@ function pic(u, { sizes = '100vw', alt = '', cls = '', eager = false, w = 1600 }
   const fallback = isUpload(u) ? ` onerror="if(this.srcset){this.removeAttribute('srcset');this.src='${esc(u)}'}"` : '';
   return `<img${cls ? ` class="${cls}"` : ''} src="${esc(srcAt(u, w))}"${ss ? ` srcset="${esc(ss)}" sizes="${sizes}"` : ''} alt="${esc(alt)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"${fallback}>`;
 }
+// Photo plein écran en object-fit: cover : sur un écran vertical, l'image affichée fait 1,5 × la hauteur
+const FULL = '(max-aspect-ratio: 3/2) 150svh, 100vw';
 const phCache = new Map();
 function ph(seed) {
   if (phCache.has(seed)) return phCache.get(seed);
@@ -183,7 +185,7 @@ function vHome() {
   const usedCats = new Set(all.map((p) => p.category).filter(Boolean));
   const firstPara = (s.aboutText || '').split(/\n\s*\n/)[0];
   return `<section class="hero" aria-label="Présentation">
-      ${sl.map((x, k) => `<div class="slide ${k === i ? 'on' : ''}" data-k="${k}">${x.img.startsWith('data:') ? `<img src="${x.img}" alt="">` : pic(x.img, { eager: k === 0, w: 2400 })}</div>`).join('')}
+      ${sl.map((x, k) => `<div class="slide ${k === i ? 'on' : ''}" data-k="${k}">${x.img.startsWith('data:') ? `<img src="${x.img}" alt="">` : pic(x.img, { eager: k === 0, w: 2400, sizes: FULL })}</div>`).join('')}
       <div class="kick mono">${esc(s.heroKicker).split('\n').join('<br>')}</div>
       <div class="in wrap gut">
         <p class="tagline">${esc(s.tagline)}</p>
@@ -251,7 +253,7 @@ function vProject() {
   const all = pub(), idx = all.findIndex((x) => x.id === p.id), nxt = all.length > 1 ? all[(idx + 1) % all.length] : null;
   const im = imgsOf(p);
   const spec = [['Catégorie', p.category], ['Année', p.year], ['Lieu', p.location], ['Images', im.length && p.images.length ? pad(p.images.length) : '']].filter((r) => r[1]);
-  return `<section class="p-hero">${im[0].startsWith('data:') ? `<img src="${im[0]}" alt="">` : pic(im[0], { eager: true, w: 2400, alt: p.title })}
+  return `<section class="p-hero">${im[0].startsWith('data:') ? `<img src="${im[0]}" alt="">` : pic(im[0], { eager: true, w: 2400, alt: p.title, sizes: FULL })}
       <div class="in wrap gut"><div class="row mono">${idx >= 0 ? `<span>${pad(idx + 1)} / ${pad(all.length)}</span>` : ''}<span>${esc(p.category)}</span><span>${esc(p.year)}</span>${p.location ? `<span>${esc(p.location)}</span>` : ''}${p.example ? '<span>Exemple</span>' : ''}${!p.published ? '<span>Masqué</span>' : ''}</div>
       <h1 class="xl">${esc(p.title)}</h1></div>
       <span class="scroll-hint mono">${ic('down')}</span></section>
@@ -264,7 +266,7 @@ function vProject() {
       </aside>
       <div class="p-gal">${im.map((u, i) => `<button data-a="lb" data-i="${i}" aria-label="Agrandir l'image ${i + 1}">${u.startsWith('data:') ? `<img src="${u}" alt="">` : pic(u, { sizes: '(min-width:1000px) 58vw, 100vw', alt: `${p.title} — image ${i + 1}` })}</button>`).join('')}</div>
     </div></div>
-    ${nxt ? `<a class="next" href="${href(nxt)}">${pic(cover(nxt), { w: 2400 })}<div class="in wrap gut"><span class="mono">Projet suivant</span><h2 class="xl">${esc(nxt.title)}</h2></div></a>` : ''}
+    ${nxt ? `<a class="next" href="${href(nxt)}">${pic(cover(nxt), { w: 2400, sizes: FULL })}<div class="in wrap gut"><span class="mono">Projet suivant</span><h2 class="xl">${esc(nxt.title)}</h2></div></a>` : ''}
     ${footer()}`;
 }
 function contactItems() {
