@@ -11,7 +11,7 @@
 
 const SESSION_COOKIE = 'rp_session';
 const SESSION_DAYS = 30;
-const MAX_IMAGE = 15 * 1024 * 1024;
+const MAX_IMAGE = 25 * 1024 * 1024;
 const MAX_PDF = 60 * 1024 * 1024;
 const SITE_KEYS = ['name', 'role', 'heroKicker', 'tagline', 'heroImage', 'aboutImage', 'aboutText', 'location', 'email', 'phone', 'instagram', 'linkedin', 'categories'];
 const TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif', 'image/avif': 'avif', 'application/pdf': 'pdf' };
@@ -120,8 +120,11 @@ async function getProjects(env, includeHidden) {
 }
 
 const isMediaUrl = (u) => typeof u === 'string' && /^\/media\/[A-Za-z0-9._-]+$/.test(u);
-// Fichiers acceptés : envoyés dans R2 (/media/…) ou fournis avec le site (/examples/…)
-const isImageUrl = (u) => isMediaUrl(u) || (typeof u === 'string' && /^\/examples\/[A-Za-z0-9._-]+$/.test(u));
+// Fichiers acceptés : envoyés dans R2 (/media/…), fournis avec le site (/examples/…)
+// ou photos d'exemple Unsplash (servies en 4K depuis leur CDN)
+const isImageUrl = (u) => isMediaUrl(u) || (typeof u === 'string' && (/^\/examples\/[A-Za-z0-9._-]+$/.test(u) || /^https:\/\/images\.unsplash\.com\/photo-[A-Za-z0-9-]+$/.test(u)));
+// Chaque photo envoyée a une version moyenne « nom.m.jpg » (1280 px) pour les petits écrans
+const previewKey = (key) => key.replace(/(\.[a-z0-9]+)$/i, '.m$1');
 
 function cleanProject(input) {
   const p = {
@@ -153,7 +156,7 @@ function cleanSite(input, current) {
 }
 
 async function deleteMedia(env, urls) {
-  const keys = urls.filter(isMediaUrl).map((u) => u.slice('/media/'.length));
+  const keys = urls.filter(isMediaUrl).map((u) => u.slice('/media/'.length)).flatMap((k) => [k, previewKey(k)]);
   if (keys.length && env.MEDIA) await env.MEDIA.delete(keys);
 }
 
@@ -249,7 +252,9 @@ async function api(request, env, url) {
     const max = type === 'application/pdf' ? MAX_PDF : MAX_IMAGE;
     if (size > max) fail(413, `Fichier trop lourd (maximum ${Math.round(max / 1048576)} Mo).`);
     const name = str(decodeURIComponent(request.headers.get('x-filename') || ''), 160) || 'fichier.' + ext;
-    const key = uid() + '.' + ext;
+    const previewOf = request.headers.get('x-preview-for') || '';
+    if (previewOf && !/^[A-Za-z0-9]+\.(jpg|png|webp)$/.test(previewOf)) fail(400, 'Aperçu invalide.');
+    const key = previewOf ? previewKey(previewOf) : uid() + '.' + ext;
     const obj = await env.MEDIA.put(key, request.body, {
       httpMetadata: { contentType: type, cacheControl: 'public, max-age=31536000, immutable' },
       customMetadata: { name },
