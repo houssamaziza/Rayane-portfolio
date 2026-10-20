@@ -1,0 +1,34 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rayane-portfolio",
+  "main": "src/worker.js",
+  "compatibility_date": "2025-09-01",
+  "workers_dev": true,
+  "observability": { "enabled": true },
+
+  // Application web (fichiers statiques). Le Worker répond d'abord à /api et /media.
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/media/*"]
+  },
+
+  // Projets et textes du site
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "rayane-portfolio",
+      "database_id": "360e3031-2df4-435a-9a40-c53fe991ca5e",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // Photos et PDF envoyés depuis l'espace administrateur
+  "r2_buckets": [
+    { "binding": "MEDIA", "bucket_name": "rayane-portfolio-media" }
+  ]
+
+  // Secret à définir dans Cloudflare (Settings → Variables and Secrets) :
+  //   ADMIN_PASSWORD  mot de passe de l'espace administrateur
+}

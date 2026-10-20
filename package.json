@@ -1,0 +1,16 @@
+{
+  "name": "rayane-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Portfolio d'architecture de Rayane — Cloudflare Workers + D1 + R2",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:migrate": "wrangler d1 migrations apply rayane-portfolio --remote",
+    "db:migrate:local": "wrangler d1 migrations apply rayane-portfolio --local"
+  },
+  "devDependencies": {
+    "wrangler": "^4.40.0"
+  }
+}
