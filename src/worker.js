@@ -120,6 +120,7 @@ async function getProjects(env, includeHidden) {
 }
 
 const isMediaUrl = (u) => typeof u === 'string' && /^\/media\/[A-Za-z0-9._-]+$/.test(u);
+// Fichiers acceptés : envoyés dans R2 (/media/…) ou fournis avec le site (/examples/…)
 const isImageUrl = (u) => isMediaUrl(u) || (typeof u === 'string' && /^\/examples\/[A-Za-z0-9._-]+$/.test(u));
 
 function cleanProject(input) {
@@ -133,7 +134,7 @@ function cleanProject(input) {
     pdf: null,
     published: input.published !== false,
   };
-  if (input.pdf && isMediaUrl(input.pdf.url)) {
+  if (input.pdf && isImageUrl(input.pdf.url)) {
     p.pdf = { url: input.pdf.url, name: str(input.pdf.name, 160) || 'portfolio.pdf', size: Number(input.pdf.size) || 0 };
   }
   if (!p.title) fail(400, 'Le titre du projet est obligatoire.');
