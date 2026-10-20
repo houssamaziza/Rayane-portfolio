@@ -1,6 +1,6 @@
-# Rayane — portfolio d'architecture
+# Rayene Mohamed Cheghib — portfolio d'architecture
 
-Application web installable (PWA) qui présente les projets de Rayane, architecte, avec un espace administrateur pour publier projets, photos et PDF sans développeur.
+Application web installable (PWA) qui présente les projets de Rayene Mohamed Cheghib, architecte, avec un espace administrateur pour publier projets, photos et PDF sans développeur.
 
 Hébergée sur **Cloudflare Workers** :
 

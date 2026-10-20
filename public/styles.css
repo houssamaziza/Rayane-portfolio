@@ -324,3 +324,6 @@ main{min-height:100svh}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.hero .slide img{transform:none}}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:.35s}
 @media (min-width:900px){.only-m{display:none!important}}
+
+/* nom long : on masque le titre à côté du nom sur petit écran */
+@media (max-width:600px){.hdr .brand small{display:none}.brand{font-size:13px;letter-spacing:.04em}}
