@@ -188,8 +188,8 @@ function vHome() {
       ${sl.map((x, k) => `<div class="slide ${k === i ? 'on' : ''}" data-k="${k}">${x.img.startsWith('data:') ? `<img src="${x.img}" alt="">` : pic(x.img, { eager: k === 0, w: 2400, sizes: FULL })}</div>`).join('')}
       <div class="kick mono">${esc(s.heroKicker).split('\n').join('<br>')}</div>
       <div class="in wrap gut">
+        <h1 class="vh">${esc(s.name)} — ${esc(s.role)}</h1>
         <p class="tagline">${esc(s.tagline)}</p>
-        <h1 class="xl name">${esc(s.name)}</h1>
         <div class="foot">
           <div class="now" id="now">${nowLabel(cur, i, sl.length)}</div>
           ${sl.length > 1 ? `<div class="bars" role="tablist" aria-label="Diapositives">${sl.map((_, k) => `<button data-a="slide" data-k="${k}" class="${k === i ? 'on' : k < i ? 'done' : ''}" aria-label="Image ${k + 1}"><span><i></i></span></button>`).join('')}</div>` : ''}
